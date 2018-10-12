@@ -11,9 +11,8 @@
 void IndexOutput::addPage(const std::map<std::string, size_t>& freqMap, size_t docId, bool debug) {
     std::ofstream tmpFile(indexName, std::ios::binary | std::ios::out);
     
-    
     // Create lexicon structure and posting
-    size_t line = 0;
+    size_t pos = 0;
     for (const auto& e : freqMap) {
         Posting newPosting = Posting(docId, e.second);
         
@@ -23,8 +22,9 @@ void IndexOutput::addPage(const std::map<std::string, size_t>& freqMap, size_t d
             tmpFile.write(reinterpret_cast<const char *>(&newPosting.docId), sizeof(newPosting.docId));
             tmpFile.write(reinterpret_cast<const char *>(&newPosting.frequency), sizeof(newPosting.frequency));
         }
-        lexicon[e.first] = LexiconEntry(line, 1);
-        ++line;
+        size_t entryLen = sizeof(newPosting.docId) + sizeof(newPosting.frequency);
+        lexicon[e.first] = LexiconEntry(pos, entryLen);
+        pos += entryLen;
     }
     
     // Write posting to small file on disk
@@ -37,14 +37,42 @@ void IndexOutput::display() const {
         std::cout << e.first << ' ' << e.second.invListPos << ' ' << e.second.invListLen << '\n';
 }
 
-bool IndexOutput::operator<(const IndexOutput& rhs) const {
-    return indexName < rhs.indexName;
-}
-
 std::string IndexOutput::getIndexName() const {
     return indexName;
 }
 
-bool Posting::operator<(const Posting& rhs) const {
-    return docId < rhs.docId;
+HeapEntry IndexOutput::getNextTerm() {
+    HeapEntry res;
+    res.term = lexicon.begin()->first;
+//    res.invListPos = lexicon.begin()->second.invListPos;
+//    res.invListLen = lexicon.begin()->second.invListLen;
+    std::ifstream ifs(indexName, std::ios::binary | std::ios::out);
+    if (!ifs) {
+        std::cerr << "Failure to open " << indexName << '\n';
+        exit(1);
+    }
+    ifs.seekg(lexicon.begin()->second.invListPos);
+    ifs.read(reinterpret_cast<char *>(&res.docId), sizeof(res.docId));
+    ifs.read(reinterpret_cast<char *>(&res.frequency), sizeof(res.frequency));
+        
+    lexicon.erase(res.term);
+    if (lexicon.empty()) {
+        std::cout << "Lexicon empty... Deleting file\n";
+        if (remove(indexName.c_str()) != 0)
+            std::cout << "Error removing " << indexName << '\n';
+    }
+    
+    return res;
+}
+
+bool HeapEntry::operator<(const HeapEntry& rhs) const {
+    return term < rhs.term;
+}
+
+void IndexOutput::addLexiconEntry(const std::string& term, size_t p, size_t s) {
+    lexicon[term] = LexiconEntry(p, s);
+}
+
+bool IndexOutput::isEmpty() const {
+    return lexicon.empty();
 }

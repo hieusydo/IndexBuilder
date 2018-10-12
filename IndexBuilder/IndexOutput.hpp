@@ -19,9 +19,14 @@
 struct Posting {
     Posting(size_t id, size_t f) : docId(id), frequency(f) {}
     
-    bool operator<(const Posting& rhs) const;
-    
     size_t docId; // also rowLen in UrlTable
+    size_t frequency;
+};
+
+struct HeapEntry {
+    bool operator<(const HeapEntry& rhs) const;
+    std::string term;
+    size_t docId;
     size_t frequency;
 };
 
@@ -39,15 +44,18 @@ private:
 
 public:
     IndexOutput(const std::string& n) : indexName(n) {}
-    
-    bool operator<(const IndexOutput& rhs) const;
-
+        
     void addPage(const std::map<std::string, size_t>& freqMap, size_t docId, bool debug);
+    
+    void addLexiconEntry(const std::string& term, size_t p, size_t s);
     
     void display() const;
     
     std::string getIndexName() const;
     
+    HeapEntry getNextTerm(); 
+    
+    bool isEmpty() const;
 };
 
 #endif /* IndexOutput_hpp */

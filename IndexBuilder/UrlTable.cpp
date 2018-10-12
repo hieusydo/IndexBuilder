@@ -14,8 +14,8 @@ void UrlTable::addEntry(const std::string& u, size_t d) {
 
 void UrlTable::display() const {
     std::cout << "==========\nUrlTable:\n";
-    for (const UrlEntry& e : urlTable)
-        std::cout << e.documentLen << ' ' << e.url << '\n';
+    for (size_t i = 0; i < urlTable.size(); ++i)
+        std::cout << i << urlTable[i].documentLen << ' ' << urlTable[i].url << '\n';
 }
 
 size_t UrlTable::size() const {
