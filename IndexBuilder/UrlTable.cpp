@@ -15,9 +15,20 @@ void UrlTable::addEntry(const std::string& u, size_t d) {
 void UrlTable::display() const {
     std::cout << "==========\nUrlTable:\n";
     for (size_t i = 0; i < urlTable.size(); ++i)
-        std::cout << i << urlTable[i].documentLen << ' ' << urlTable[i].url << '\n';
+        std::cout << i << "  " << urlTable[i].url << "  " << urlTable[i].documentLen << '\n';
 }
 
 size_t UrlTable::size() const {
     return urlTable.size();
+}
+
+void UrlTable::writeToDisk(const std::string& pathname) const {
+    std::ofstream ofs(pathname);
+    if (!ofs) {
+        std::cerr << "Cannot open " << pathname << '\n';
+        exit(1);
+    }
+    for (size_t i = 0; i < urlTable.size(); ++i)
+        ofs << i << ' ' << urlTable[i].url << ' ' << urlTable[i].documentLen << '\n';
+    ofs.close();
 }

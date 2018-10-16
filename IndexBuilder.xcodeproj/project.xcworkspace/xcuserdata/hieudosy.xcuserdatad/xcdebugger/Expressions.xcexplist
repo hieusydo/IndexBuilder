@@ -6,15 +6,21 @@
          contextName = "main:main.cpp">
          <PersistentStrings>
             <PersistentString
-               value = "line.substr(pos + delimitLen, line.size())">
+               value = "string::stoi(&quot;2001, A Space Odyssey&quot;)">
             </PersistentString>
             <PersistentString
                value = "line.substr(0, pos)">
             </PersistentString>
             <PersistentString
-               value = "string::stoi(&quot;2001, A Space Odyssey&quot;)">
+               value = "line.substr(pos + delimitLen, line.size())">
             </PersistentString>
          </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "getStrFromBuffer(char*, unsigned long&amp;):PostingGenerator.cpp">
+      </ContextState>
+      <ContextState
+         contextName = "putPostingToBuffer(char*, unsigned long, unsigned long&amp;, Posting const&amp;, unsigned long):PostingGenerator.cpp">
       </ContextState>
    </ContextStates>
 </VariablesViewState>

@@ -8,71 +8,83 @@
 
 #include "IndexOutput.hpp"
 
-void IndexOutput::addPage(const std::map<std::string, size_t>& freqMap, size_t docId, bool debug) {
-    std::ofstream tmpFile(indexName, std::ios::binary | std::ios::out);
-    
-    // Create lexicon structure and posting
-    size_t pos = 0;
-    for (const auto& e : freqMap) {
-        Posting newPosting = Posting(docId, e.second);
-        
-        if (debug) {
-            tmpFile << newPosting.docId << ' ' << newPosting.frequency << '\n';
-        } else {
-            tmpFile.write(reinterpret_cast<const char *>(&newPosting.docId), sizeof(newPosting.docId));
-            tmpFile.write(reinterpret_cast<const char *>(&newPosting.frequency), sizeof(newPosting.frequency));
-        }
-        size_t entryLen = sizeof(newPosting.docId) + sizeof(newPosting.frequency);
-        lexicon[e.first] = LexiconEntry(pos, entryLen);
-        pos += entryLen;
-    }
-    
-    // Write posting to small file on disk
-    tmpFile.close();
-}
+IndexOutput::LexiconEntry::LexiconEntry() {} // for std::map
+IndexOutput::LexiconEntry::LexiconEntry(unsigned p, unsigned s) : invListPos(p), invListLen(s) {}
 
-void IndexOutput::display() const {
-    std::cout << "==========\nIndexOutput:\n";
-    for (const auto& e : lexicon)
-        std::cout << e.first << ' ' << e.second.invListPos << ' ' << e.second.invListLen << '\n';
-}
-
-std::string IndexOutput::getIndexName() const {
-    return indexName;
-}
-
-HeapEntry IndexOutput::getNextTerm() {
-    HeapEntry res;
-    res.term = lexicon.begin()->first;
-//    res.invListPos = lexicon.begin()->second.invListPos;
-//    res.invListLen = lexicon.begin()->second.invListLen;
-    std::ifstream ifs(indexName, std::ios::binary | std::ios::out);
-    if (!ifs) {
-        std::cerr << "Failure to open " << indexName << '\n';
+IndexOutput::IndexOutput(const std::string& index, const std::string& inter) : indexFn(index), interFn(inter) {
+    std::ofstream finalIndex(indexFn, std::ios::binary | std::ios::out);
+    std::ifstream interFile(interFn);
+    if (!interFile) {
+        std::cerr << "Error opening " << interFn << '\n';
         exit(1);
     }
-    ifs.seekg(lexicon.begin()->second.invListPos);
-    ifs.read(reinterpret_cast<char *>(&res.docId), sizeof(res.docId));
-    ifs.read(reinterpret_cast<char *>(&res.frequency), sizeof(res.frequency));
-        
-    lexicon.erase(res.term);
-    if (lexicon.empty()) {
-        std::cout << "Lexicon empty... Deleting file\n";
-        if (remove(indexName.c_str()) != 0)
-            std::cout << "Error removing " << indexName << '\n';
+
+    size_t bufferSize = 100000000;
+    char* docBuffer = new char[bufferSize];
+    size_t bufferPos = 0; // current position in buffer
+
+    unsigned lastIndexPos = 0;
+
+    std::string term;
+    unsigned docId;
+    unsigned freq;
+    while (interFile >> term >> docId >> freq) {
+        Posting newPosting(term, docId, freq);
+        readPostingToBuffer(docBuffer, bufferSize, bufferPos, newPosting, lastIndexPos, finalIndex);
     }
-    
-    return res;
+
+    writeBufferToIndex(docBuffer, bufferSize, bufferPos, lastIndexPos, finalIndex);
+    delete [] docBuffer;
+    finalIndex.close();
+    interFile.close();
+
+    writeToDisk("lexicon");
 }
 
-bool HeapEntry::operator<(const HeapEntry& rhs) const {
-    return term < rhs.term;
+void IndexOutput::writeBufferToIndex(char* docBuffer, size_t bufferSize, size_t& currPos, unsigned& lastIndexPos, std::ofstream& finalIndex) {
+    std::cout << "Buffer is full.. Writing to index...\n";
+
+    finalIndex.seekp(lastIndexPos);
+
+    size_t i = 0;
+    while (i < currPos) {
+        std::string term = getStrFromBuffer(docBuffer, bufferSize, i);
+        size_t docId = stoi(getStrFromBuffer(docBuffer, bufferSize, i));
+        size_t freq = stoi(getStrFromBuffer(docBuffer, bufferSize, i));
+        // Update inverted lists
+        finalIndex.write(reinterpret_cast<const char *>(&docId), sizeof(docId));
+        finalIndex.write(reinterpret_cast<const char *>(&freq), sizeof(freq));
+        // Update lexicon
+        unsigned entryLen = sizeof(docId) + sizeof(freq);
+        lexicon[term] = LexiconEntry(lastIndexPos, entryLen);
+        lastIndexPos += entryLen;
+    }
+
+    //Flush buffer
+    memset(docBuffer, 0, bufferSize);
+    currPos = 0;
 }
 
-void IndexOutput::addLexiconEntry(const std::string& term, size_t p, size_t s) {
-    lexicon[term] = LexiconEntry(p, s);
+void IndexOutput::readPostingToBuffer(char* docBuffer, size_t bufferSize, size_t& currPos, const Posting& aPosting, unsigned& lastIndexPos, std::ofstream& finalIndex) {
+    if (aPosting.size() + currPos > bufferSize) {
+        writeBufferToIndex(docBuffer, bufferSize, currPos, lastIndexPos, finalIndex);
+    }
+    // Else, put to buffer
+    else {
+        putStrToBuffer(docBuffer, bufferSize, currPos, aPosting.term);
+        putStrToBuffer(docBuffer, bufferSize, currPos, std::to_string(aPosting.docId));
+        putStrToBuffer(docBuffer, bufferSize, currPos, std::to_string(aPosting.frequency));
+    }
 }
 
-bool IndexOutput::isEmpty() const {
-    return lexicon.empty();
+
+void IndexOutput::writeToDisk(const std::string& pathname) const {
+    std::ofstream ofs(pathname);
+    if (!ofs) {
+        std::cerr << "Cannot open " << pathname << '\n';
+        exit(1);
+    }
+    for (const auto& e : lexicon)
+        ofs << e.first << ' ' << e.second.invListPos << ' ' << e.second.invListLen << '\n';
+    ofs.close();
 }

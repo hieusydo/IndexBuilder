@@ -9,8 +9,18 @@
 #ifndef common_hpp
 #define common_hpp
 
-#include <stdio.h>
+#include <algorithm>
+#include <fstream>
 #include <string>
+#include <iostream>
+#include <sstream>
+#include <set>
+#include <stdio.h>
+#include <map>
+#include <queue>
+#include <vector>
+
+const int NUM_SIZE = 8;
 
 // Return true if line has only alphanumeric chars, false otherwise
 bool isStrAlnum(const std::string& line);

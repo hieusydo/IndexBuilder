@@ -7,10 +7,6 @@
 //
 
 #include "common.hpp"
-#include <string>
-#include <sstream>
-#include <vector>
-#include <iostream>
 
 const std::string DELIMITERS(";,:. \r\n\t");
 

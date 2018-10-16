@@ -9,10 +9,7 @@
 #ifndef UrlTable_hpp
 #define UrlTable_hpp
 
-#include <stdio.h>
-#include <string>
-#include <vector>
-#include <iostream>
+#include "common.hpp"
 
 class UrlTable {
     struct UrlEntry {
@@ -27,6 +24,7 @@ public:
     void addEntry(const std::string& u, size_t d);
     void display() const;
     size_t size() const;
+    void writeToDisk(const std::string& pathname) const;
 };
 
 #endif /* UrlTable_hpp */
