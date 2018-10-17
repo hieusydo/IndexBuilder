@@ -30,6 +30,8 @@ IndexOutput::IndexOutput(const std::string& index, const std::string& inter) : i
     unsigned freq;
     while (interFile >> term >> docId >> freq) {
         Posting newPosting(term, docId, freq);
+        // TODO (optional): format postings for query processing
+        // TODO (optional): compression
         readPostingToBuffer(docBuffer, bufferSize, bufferPos, newPosting, lastIndexPos, finalIndex);
     }
 

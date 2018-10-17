@@ -9,13 +9,15 @@
 #ifndef common_hpp
 #define common_hpp
 
+#include <dirent.h>
+#include <stdio.h>
+
 #include <algorithm>
 #include <fstream>
 #include <string>
 #include <iostream>
 #include <sstream>
 #include <set>
-#include <stdio.h>
 #include <map>
 #include <queue>
 #include <vector>

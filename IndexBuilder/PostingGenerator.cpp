@@ -8,7 +8,7 @@
 
 #include "PostingGenerator.hpp"
 
-int generatePostings() {
+int generatePostings(const std::string& dirName) {
     size_t bufferSize = 100000000;
     char* docBuffer = new char[bufferSize];
     size_t bufferPos = 0; // current position in buffer
@@ -22,10 +22,12 @@ int generatePostings() {
     // Flag to skip all intro data till first "WARC/1.0" with actual page
     bool skipIntro = true;
     
-    int wetNum = 10;
-    while (--wetNum >= 0) {
-        std::string filename = "wet_files/0000" + std::to_string(wetNum) + ".warc.wet";
-        std::fstream wetFile(filename);
+    std::vector<std::string> allFiles = getAllFiles(dirName);
+    for (const std::string& filename : allFiles) {
+        
+        std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+        
+        std::fstream wetFile(dirName + '/' + filename);
         if (!wetFile) {
             std::cerr << "Error opening WET file: " << filename << std::endl;
             exit(1);
@@ -79,8 +81,6 @@ int generatePostings() {
                     getline(wetFile, line);
                 }
                 
-                // Print parsed header
-                //            std::cout << "New: " << documentLen << ' ' << documentUri << std::endl;
                 urlTable.addEntry(documentUri, documentLen);
                 
             } else if (skipIntro) {
@@ -93,9 +93,12 @@ int generatePostings() {
             }
         }
         wetFile.close();
+        
+        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+        std::cout << "Finished parsing " << filename << ' ' << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << "s.\n";
     }
     
-    // TODO: Flush out the rest to disk
+    // Flush out the rest to disk
     flushBuffer(docBuffer, bufferSize, bufferPos, fileCnt);
 
     delete [] docBuffer;
@@ -179,4 +182,24 @@ void parseWetHeader(const std::string& line, std::string& documentUri, int& docu
 
 size_t Posting::size() const {
     return term.size() + std::to_string(docId).size() + std::to_string(frequency).size() + 2; // 2 for 2 space char
+}
+
+std::vector<std::string> getAllFiles(const std::string& dirName) {
+    std::vector<std::string> allFiles;
+    DIR *dir;
+    struct dirent *ent;
+    if ((dir = opendir (dirName.c_str())) != NULL) {
+        while ((ent = readdir (dir)) != NULL) {
+            std::string fn = std::string(ent->d_name);
+            // Only return WET files
+            if (fn.find("warc.wet") != std::string::npos) {
+                allFiles.push_back(fn);
+            }
+        }
+        closedir (dir);
+    } else {
+        std::cerr << "Cannot open directory " << dirName << '\n';
+        exit(1);
+    }
+    return allFiles;
 }
