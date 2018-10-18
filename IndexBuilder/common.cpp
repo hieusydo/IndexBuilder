@@ -38,24 +38,24 @@ std::vector<std::string> tokenizeDocStream(const std::string& inputString) {
     std::stringstream stringStream(inputString);
     char c;
     std::vector<std::string> wordVector;
-    
+
     while (stringStream) {
         std::string word;
-        
+
         // Read word
         while (!isDelim((c = stringStream.get())) && c != EOF) {
             word.push_back(c);
         }
         if (c != EOF)
             stringStream.unget();
-        
+
         // Filter foreign characters
         if (isStrAlnum(word)) {
             // Normalize word by converting to lowercase
             transform(word.begin(), word.end(), word.begin(), ::tolower);
             wordVector.push_back(word);
         }
-        
+
         // Skip delims
         while (isDelim((c = stringStream.get())));
         if (c != EOF)

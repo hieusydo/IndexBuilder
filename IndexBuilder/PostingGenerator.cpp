@@ -8,8 +8,8 @@
 
 #include "PostingGenerator.hpp"
 
-int generatePostings(const std::string& dirName) {
-    size_t bufferSize = 100000000;
+int generatePostings(const std::string& dirName, size_t bufferSize) {
+//    size_t bufferSize = 100000000;
     char* docBuffer = new char[bufferSize];
     size_t bufferPos = 0; // current position in buffer
     int fileCnt = 0;
@@ -132,13 +132,16 @@ void putStrToBuffer(char* docBuffer, size_t bufferSize, size_t& i, const std::st
 }
 
 void flushBuffer(char* docBuffer, size_t bufferSize, size_t& currPos, int& fileCnt) {
-    std::cout << "Buffer is full.. Writing to file...\n";
-    std::ofstream interFile(std::to_string(fileCnt++));
+    std::cout << "Buffer is full.. Writing intermediate file...\n";
+    std::ofstream interFile(std::to_string(fileCnt++), std::ios::binary | std::ios::out);
     size_t i = 0;
     while (i < currPos) {
         std::string term = getStrFromBuffer(docBuffer, bufferSize, i);
         size_t docId = stoi(getStrFromBuffer(docBuffer, bufferSize, i));
         size_t freq = stoi(getStrFromBuffer(docBuffer, bufferSize, i));
+//        interFile.write(reinterpret_cast<const char *>(&term), sizeof(term));
+//        interFile.write(reinterpret_cast<const char *>(&docId), sizeof(docId));
+//        interFile.write(reinterpret_cast<const char *>(&freq), sizeof(freq));
         interFile << term << ' ' << docId << ' ' << freq << '\n';
     }
     interFile.close();
@@ -148,7 +151,7 @@ void flushBuffer(char* docBuffer, size_t bufferSize, size_t& currPos, int& fileC
 }
 
 void putPostingToBuffer(char* docBuffer, size_t bufferSize, size_t& currPos, const Posting& aPosting, int& fileCnt) {
-    // TODO: write in binary
+    // TODO: [Byte-intermediate] write in binary
     // If buffer is full, write to file and flush buffer
     if (aPosting.size() + currPos > bufferSize) {
         flushBuffer(docBuffer, bufferSize, currPos, fileCnt);

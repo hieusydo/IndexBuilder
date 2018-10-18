@@ -26,7 +26,7 @@ private:
     std::map<std::string, LexiconEntry> lexicon;
 
 public:
-    IndexOutput(const std::string& index, const std::string& inter);
+    IndexOutput(const std::string& index, const std::string& inter, size_t bufferSize);
     
     void writeBufferToIndex(char* docBuffer, size_t bufferSize, size_t& currPos, unsigned& lastIndexPos, std::ofstream& finalIndex);
     

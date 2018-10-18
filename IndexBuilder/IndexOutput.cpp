@@ -11,7 +11,7 @@
 IndexOutput::LexiconEntry::LexiconEntry() {} // for std::map
 IndexOutput::LexiconEntry::LexiconEntry(unsigned p, unsigned s) : invListPos(p), invListLen(s) {}
 
-IndexOutput::IndexOutput(const std::string& index, const std::string& inter) : indexFn(index), interFn(inter) {
+IndexOutput::IndexOutput(const std::string& index, const std::string& inter, size_t bufferSize) : indexFn(index), interFn(inter) {
     std::ofstream finalIndex(indexFn, std::ios::binary | std::ios::out);
     std::ifstream interFile(interFn);
     if (!interFile) {
@@ -19,7 +19,7 @@ IndexOutput::IndexOutput(const std::string& index, const std::string& inter) : i
         exit(1);
     }
 
-    size_t bufferSize = 100000000;
+//    size_t bufferSize = 100000000;
     char* docBuffer = new char[bufferSize];
     size_t bufferPos = 0; // current position in buffer
 
@@ -28,10 +28,11 @@ IndexOutput::IndexOutput(const std::string& index, const std::string& inter) : i
     std::string term;
     unsigned docId;
     unsigned freq;
+    // TODO: [Byte-intermediate] Read as byte
     while (interFile >> term >> docId >> freq) {
         Posting newPosting(term, docId, freq);
         // TODO (optional): format postings for query processing
-        // TODO (optional): compression
+        // TODO (optional): varbyte compression
         readPostingToBuffer(docBuffer, bufferSize, bufferPos, newPosting, lastIndexPos, finalIndex);
     }
 
@@ -44,7 +45,7 @@ IndexOutput::IndexOutput(const std::string& index, const std::string& inter) : i
 }
 
 void IndexOutput::writeBufferToIndex(char* docBuffer, size_t bufferSize, size_t& currPos, unsigned& lastIndexPos, std::ofstream& finalIndex) {
-    std::cout << "Buffer is full.. Writing to index...\n";
+    std::cout << "Buffer is full.. Writing final index...\n";
 
     finalIndex.seekp(lastIndexPos);
 
@@ -58,7 +59,11 @@ void IndexOutput::writeBufferToIndex(char* docBuffer, size_t bufferSize, size_t&
         finalIndex.write(reinterpret_cast<const char *>(&freq), sizeof(freq));
         // Update lexicon
         unsigned entryLen = sizeof(docId) + sizeof(freq);
-        lexicon[term] = LexiconEntry(lastIndexPos, entryLen);
+        if (lexicon.find(term)!= lexicon.end()) {
+            lexicon[term].invListLen += entryLen;
+        } else {
+            lexicon[term] = LexiconEntry(lastIndexPos, entryLen);
+        }
         lastIndexPos += entryLen;
     }
 

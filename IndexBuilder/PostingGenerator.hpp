@@ -23,7 +23,7 @@ struct Posting {
     unsigned frequency;
 };
 
-int generatePostings(const std::string& dirName);
+int generatePostings(const std::string& dirName, size_t bufferSize);
 
 // Extract documentUri and documentLen IF exists in line parameter
 void parseWetHeader(const std::string& line, std::string& documentUri, int& documentLen);
