@@ -9,7 +9,11 @@
 #ifndef PostingGenerator_hpp
 #define PostingGenerator_hpp
 
-#include "common.hpp"
+#include <string>
+#include <sstream>
+#include <vector>
+#include <map>
+#include <dirent.h>
 #include "UrlTable.hpp"
 
 struct Posting {
@@ -23,19 +27,58 @@ struct Posting {
     unsigned frequency;
 };
 
-int generatePostings(const std::string& dirName, size_t bufferSize);
+class PostingGenerator {
+private:
+    // Directory with all WET files
+    std::string dirName;
+    
+    // Delimiters to tokenize string
+    const std::string DELIMITERS = ";,:. \r\n\t";
+    
+    // Buffer fields and methods to process WET files
+    // TODO: optimize with stringstream? ostringstream??
+    size_t bufferSize;
+    char* docBuffer;
+    size_t currBufferPos;
 
-// Extract documentUri and documentLen IF exists in line parameter
-void parseWetHeader(const std::string& line, std::string& documentUri, int& documentLen);
-
-std::string getStrFromBuffer(char* docBuffer, size_t bufferSize, size_t& i);
-
-void putStrToBuffer(char* docBuffer, size_t bufferSize, size_t& i, const std::string& aStr);
-
-void flushBuffer(char* docBuffer, size_t bufferSize, size_t& currPos, int& fileCnt);
-
-void putPostingToBuffer(char* docBuffer, size_t bufferSize, size_t& currPos, const Posting& aPosting, int& fileCnt);
-
-std::vector<std::string> getAllFiles(const std::string& dirName);
+    // Extract a string from i to the next blank space
+    std::string getStrFromBuffer(size_t& i);
+    
+    // Append the string to buffer[currBufferPos]
+    void putStrToBuffer(const std::string& aStr);
+    
+    // Write everything in buffer to the lastIndexPos byte of the final index
+    void flushBuffer(int& fileCnt);
+    
+    // Put posting data to buffer, call flushBuffer first if full
+    void putPostingToBuffer(const Posting& aPosting, int& fileCnt);
+    
+    // Extract documentUri and documentLen IF exists in line parameter
+    void parseWetHeader(const std::string& line, std::string& documentUri, int& documentLen);
+    
+    // Get a vector of all WET files from the directory
+    std::vector<std::string> getAllFiles();
+    
+    // Return true if line has only alphanumeric chars, false otherwise
+    bool isStrAlnum(const std::string& line);
+    
+    // Count the number of occurences of a substring in a string
+    size_t countSubstr(const std::string& aString, const std::string& subStr);
+    
+    // Split string into words by delimiters
+    // and also normalize them along the way
+    inline bool isDelim(char c);
+    std::vector<std::string> tokenizeDocStream(const std::string& inputString);
+    
+public:
+    // The constructor initialize the directory name and the buffer
+    PostingGenerator(const std::string& dn, size_t sz);
+    
+    // Destructor to free docBuffer
+    ~PostingGenerator();
+    
+    // Parse the WET files to generate intermediate postings
+    int generatePostings();
+};
 
 #endif /* PostingGenerator_hpp */

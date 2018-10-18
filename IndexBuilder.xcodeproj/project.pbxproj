@@ -8,8 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		74D6002821755C30003A2308 /* PostingGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 74D6002621755C30003A2308 /* PostingGenerator.cpp */; };
-		74E6382B216E651D003E64E1 /* common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 74E63829216E651D003E64E1 /* common.cpp */; };
-		74E6382E216E6935003E64E1 /* IndexOutput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 74E6382C216E6935003E64E1 /* IndexOutput.cpp */; };
+		74E6382E216E6935003E64E1 /* InvertedIndex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 74E6382C216E6935003E64E1 /* InvertedIndex.cpp */; };
 		74E63832216E9125003E64E1 /* UrlTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 74E63830216E9125003E64E1 /* UrlTable.cpp */; };
 		74F3D911216D817700604DBE /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 74F3D910216D817700604DBE /* main.cpp */; };
 /* End PBXBuildFile section */
@@ -30,10 +29,8 @@
 		74D6002621755C30003A2308 /* PostingGenerator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PostingGenerator.cpp; sourceTree = "<group>"; };
 		74D6002721755C30003A2308 /* PostingGenerator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = PostingGenerator.hpp; sourceTree = "<group>"; };
 		74E63828216DC519003E64E1 /* wet_files */ = {isa = PBXFileReference; lastKnownFileType = folder; path = wet_files; sourceTree = "<group>"; };
-		74E63829216E651D003E64E1 /* common.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = common.cpp; sourceTree = "<group>"; };
-		74E6382A216E651D003E64E1 /* common.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = common.hpp; sourceTree = "<group>"; };
-		74E6382C216E6935003E64E1 /* IndexOutput.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = IndexOutput.cpp; sourceTree = "<group>"; };
-		74E6382D216E6935003E64E1 /* IndexOutput.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = IndexOutput.hpp; sourceTree = "<group>"; };
+		74E6382C216E6935003E64E1 /* InvertedIndex.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = InvertedIndex.cpp; sourceTree = "<group>"; };
+		74E6382D216E6935003E64E1 /* InvertedIndex.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = InvertedIndex.hpp; sourceTree = "<group>"; };
 		74E63830216E9125003E64E1 /* UrlTable.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = UrlTable.cpp; sourceTree = "<group>"; };
 		74E63831216E9125003E64E1 /* UrlTable.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = UrlTable.hpp; sourceTree = "<group>"; };
 		74F3D90D216D817700604DBE /* IndexBuilder */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = IndexBuilder; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -72,10 +69,8 @@
 			children = (
 				74E63828216DC519003E64E1 /* wet_files */,
 				74F3D910216D817700604DBE /* main.cpp */,
-				74E63829216E651D003E64E1 /* common.cpp */,
-				74E6382A216E651D003E64E1 /* common.hpp */,
-				74E6382C216E6935003E64E1 /* IndexOutput.cpp */,
-				74E6382D216E6935003E64E1 /* IndexOutput.hpp */,
+				74E6382C216E6935003E64E1 /* InvertedIndex.cpp */,
+				74E6382D216E6935003E64E1 /* InvertedIndex.hpp */,
 				74E63830216E9125003E64E1 /* UrlTable.cpp */,
 				74E63831216E9125003E64E1 /* UrlTable.hpp */,
 				74D6002621755C30003A2308 /* PostingGenerator.cpp */,
@@ -141,8 +136,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				74E63832216E9125003E64E1 /* UrlTable.cpp in Sources */,
-				74E6382B216E651D003E64E1 /* common.cpp in Sources */,
-				74E6382E216E6935003E64E1 /* IndexOutput.cpp in Sources */,
+				74E6382E216E6935003E64E1 /* InvertedIndex.cpp in Sources */,
 				74D6002821755C30003A2308 /* PostingGenerator.cpp in Sources */,
 				74F3D911216D817700604DBE /* main.cpp in Sources */,
 			);

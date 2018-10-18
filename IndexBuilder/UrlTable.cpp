@@ -32,3 +32,5 @@ void UrlTable::writeToDisk(const std::string& pathname) const {
         ofs << i << ' ' << urlTable[i].url << ' ' << urlTable[i].documentLen << '\n';
     ofs.close();
 }
+
+UrlTable::UrlEntry::UrlEntry(const std::string& u, size_t d) : url(u), documentLen(d) {}

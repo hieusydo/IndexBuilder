@@ -8,10 +8,13 @@
 
 #include "PostingGenerator.hpp"
 
-int generatePostings(const std::string& dirName, size_t bufferSize) {
-//    size_t bufferSize = 100000000;
-    char* docBuffer = new char[bufferSize];
-    size_t bufferPos = 0; // current position in buffer
+PostingGenerator::PostingGenerator(const std::string& dn, size_t sz) : dirName(dn), bufferSize(sz), docBuffer(new char[sz]), currBufferPos(0) {}
+
+PostingGenerator::~PostingGenerator() {
+    delete[] docBuffer;
+}
+
+int PostingGenerator::generatePostings() {
     int fileCnt = 0;
     
     UrlTable urlTable;
@@ -22,7 +25,7 @@ int generatePostings(const std::string& dirName, size_t bufferSize) {
     // Flag to skip all intro data till first "WARC/1.0" with actual page
     bool skipIntro = true;
     
-    std::vector<std::string> allFiles = getAllFiles(dirName);
+    std::vector<std::string> allFiles = getAllFiles();
     for (const std::string& filename : allFiles) {
         
         std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
@@ -66,7 +69,7 @@ int generatePostings(const std::string& dirName, size_t bufferSize) {
                     // Move postings to buffer
                     for (const auto& e : freqMap) {
                         Posting newPosting = Posting(e.first, static_cast<unsigned>(urlTable.size()), e.second);
-                        putPostingToBuffer(docBuffer, bufferSize, bufferPos, newPosting, fileCnt);
+                        putPostingToBuffer(newPosting, fileCnt);
                     }
                     
                     // Clear the document stream for the next page
@@ -98,17 +101,15 @@ int generatePostings(const std::string& dirName, size_t bufferSize) {
         std::cout << "Finished parsing " << filename << ' ' << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << "s.\n";
     }
     
-    // Flush out the rest to disk
-    flushBuffer(docBuffer, bufferSize, bufferPos, fileCnt);
-
-    delete [] docBuffer;
+    // Write out the rest to disk
+    flushBuffer(fileCnt);
     
     // Write urlTable to disk
     urlTable.writeToDisk("urlTable");
     return fileCnt;
 }
 
-std::string getStrFromBuffer(char* docBuffer, size_t bufferSize, size_t& i) {
+std::string PostingGenerator::getStrFromBuffer(size_t& i) {
     if (i > bufferSize) {
         std::cerr << "Bad access getStrFromBuffer\n";
         exit(1);
@@ -121,50 +122,43 @@ std::string getStrFromBuffer(char* docBuffer, size_t bufferSize, size_t& i) {
     return res;
 }
 
-void putStrToBuffer(char* docBuffer, size_t bufferSize, size_t& i, const std::string& aStr) {
-    if (i > bufferSize) {
+void PostingGenerator::putStrToBuffer(const std::string& aStr) {
+    if (currBufferPos > bufferSize) {
         std::cerr << "Bad here putStrToBuffer\n";
         exit(1);
     }
     for (char c : aStr)
-        docBuffer[i++] = c;
-    docBuffer[i++] = ' ';
+        docBuffer[currBufferPos++] = c;
+    docBuffer[currBufferPos++] = ' ';
 }
 
-void flushBuffer(char* docBuffer, size_t bufferSize, size_t& currPos, int& fileCnt) {
+void PostingGenerator::flushBuffer(int& fileCnt) {
     std::cout << "Buffer is full.. Writing intermediate file...\n";
     std::ofstream interFile(std::to_string(fileCnt++), std::ios::binary | std::ios::out);
     size_t i = 0;
-    while (i < currPos) {
-        std::string term = getStrFromBuffer(docBuffer, bufferSize, i);
-        size_t docId = stoi(getStrFromBuffer(docBuffer, bufferSize, i));
-        size_t freq = stoi(getStrFromBuffer(docBuffer, bufferSize, i));
-//        interFile.write(reinterpret_cast<const char *>(&term), sizeof(term));
-//        interFile.write(reinterpret_cast<const char *>(&docId), sizeof(docId));
-//        interFile.write(reinterpret_cast<const char *>(&freq), sizeof(freq));
+    while (i < currBufferPos) {
+        std::string term = getStrFromBuffer(i);
+        size_t docId = stoi(getStrFromBuffer(i));
+        size_t freq = stoi(getStrFromBuffer(i));
         interFile << term << ' ' << docId << ' ' << freq << '\n';
     }
     interFile.close();
-    //Flush buffer
+    // Reset buffer
     memset(docBuffer, 0, bufferSize);
-    currPos = 0;
+    currBufferPos = 0;
 }
 
-void putPostingToBuffer(char* docBuffer, size_t bufferSize, size_t& currPos, const Posting& aPosting, int& fileCnt) {
-    // TODO: [Byte-intermediate] write in binary
-    // If buffer is full, write to file and flush buffer
-    if (aPosting.size() + currPos > bufferSize) {
-        flushBuffer(docBuffer, bufferSize, currPos, fileCnt);
+void PostingGenerator::putPostingToBuffer(const Posting& aPosting, int& fileCnt) {
+    // If buffer is full, clean it up first
+    if (aPosting.size() + currBufferPos > bufferSize) {
+        flushBuffer(fileCnt);
     }
-    // Else, put to buffer
-    else {
-        putStrToBuffer(docBuffer, bufferSize, currPos, aPosting.term);
-        putStrToBuffer(docBuffer, bufferSize, currPos, std::to_string(aPosting.docId));
-        putStrToBuffer(docBuffer, bufferSize, currPos, std::to_string(aPosting.frequency));
-    }
+    putStrToBuffer(aPosting.term);
+    putStrToBuffer(std::to_string(aPosting.docId));
+    putStrToBuffer(std::to_string(aPosting.frequency));
 }
 
-void parseWetHeader(const std::string& line, std::string& documentUri, int& documentLen) {
+void PostingGenerator::parseWetHeader(const std::string& line, std::string& documentUri, int& documentLen) {
     // Split each line in metadata and parse uri & length
     std::string delimit = ": ";
     size_t delimitLen = delimit.size();
@@ -187,7 +181,7 @@ size_t Posting::size() const {
     return term.size() + std::to_string(docId).size() + std::to_string(frequency).size() + 2; // 2 for 2 space char
 }
 
-std::vector<std::string> getAllFiles(const std::string& dirName) {
+std::vector<std::string> PostingGenerator::getAllFiles() {
     std::vector<std::string> allFiles;
     DIR *dir;
     struct dirent *ent;
@@ -205,4 +199,57 @@ std::vector<std::string> getAllFiles(const std::string& dirName) {
         exit(1);
     }
     return allFiles;
+}
+
+bool PostingGenerator::isStrAlnum(const std::string& line) {
+    for (char c : line)
+        if (!isalnum(c)) { return false; }
+    return true;
+}
+
+size_t PostingGenerator::countSubstr(const std::string& aString, const std::string& subStr) {
+    size_t count = 0;
+    size_t pos = 0;
+    while (aString.find(subStr, pos) != std::string::npos) {
+        pos  = aString.find(subStr, pos) + subStr.size();
+        count++;
+    }
+    return count;
+}
+
+inline bool PostingGenerator::isDelim(char c) {
+    for (int i = 0; i < DELIMITERS.size(); ++i)
+        if (DELIMITERS[i] == c)
+            return true;
+    return false;
+}
+
+std::vector<std::string> PostingGenerator::tokenizeDocStream(const std::string& inputString) {
+    std::stringstream stringStream(inputString);
+    char c;
+    std::vector<std::string> wordVector;
+    
+    while (stringStream) {
+        std::string word;
+        
+        // Read word
+        while (!isDelim((c = stringStream.get())) && c != EOF) {
+            word.push_back(c);
+        }
+        if (c != EOF)
+            stringStream.unget();
+        
+        // Ignore word with non-alphanumeric chars
+        if (isStrAlnum(word)) {
+            // Normalize word by converting to lowercase
+            transform(word.begin(), word.end(), word.begin(), ::tolower);
+            wordVector.push_back(word);
+        }
+        
+        // Skip delims
+        while (isDelim((c = stringStream.get())));
+        if (c != EOF)
+            stringStream.unget();
+    }
+    return wordVector;
 }

@@ -6,9 +6,11 @@
 //  Copyright © 2018 Hieu Do. All rights reserved.
 //
 
-#include "common.hpp"
+//#include "common.hpp"
+#include <string>
+#include <iostream>
 #include "PostingGenerator.hpp"
-#include "IndexOutput.hpp"
+#include "InvertedIndex.hpp"
 
 // Calling Unix sort util to sort and merge intermediate postings
 std::string invokeUnixUtil(int numPostings, size_t bufferSize);
@@ -31,15 +33,15 @@ int main(int argc, const char * argv[]) {
         exit(1);
     }
     
-    // Generate postings from WET files
-    int numPostings = generatePostings("wet_files", bufferSize);
+    // 1. Generate postings from WET files
+    int numPostings = PostingGenerator("wet_files", bufferSize).generatePostings();
 
-    // Sort and merge intermediate postings
+    // 2. Sort and merge intermediate postings
     std::string interFn = invokeUnixUtil(numPostings, bufferSize);
 
-    // Generate final index
+    // 3. Generate final index
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-    IndexOutput("finalIndex", interFn, bufferSize);
+    InvertedIndex("finalIndex", interFn, bufferSize);
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
     std::cout << "Finished generating final index " << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << "s.\n";
 
@@ -51,9 +53,7 @@ int main(int argc, const char * argv[]) {
     return 0;
 }
 
-std::string invokeUnixUtil(int numPostings, size_t bufferSize) {
-    //TODO: [Byte-intermediate] sort by byte
-    
+std::string invokeUnixUtil(int numPostings, size_t bufferSize) {    
     std::string res = "merged";
     
     std::string baseCmd = "sort -S " + std::to_string(bufferSize) + "b -k1,1 -k2n ";
