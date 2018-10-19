@@ -19,7 +19,7 @@ int PostingGenerator::generatePostings() {
     
     UrlTable urlTable;
     
-    std::string documentStream;
+    std::string documentString;
     std::string documentUri;
     int documentLen = 0;
     // Flag to skip all intro data till first "WARC/1.0" with actual page
@@ -52,19 +52,10 @@ int PostingGenerator::generatePostings() {
                 skipIntro = false;
                 
                 // Generate intermediate posting once a page is parsed
-                if (!documentStream.empty()) {
-                    std::vector<std::string> words = tokenizeDocStream(documentStream);
-                    
+                if (!documentString.empty()) {
                     // Count frequency
                     std::map<std::string, unsigned> freqMap;
-                    for (const std::string& w : words) {
-                        if (w.size() == 0) { continue; }
-                        if (freqMap.find(w) == freqMap.end()) {
-                            freqMap[w] = 1;
-                        } else {
-                            freqMap[w] += 1;
-                        }
-                    }
+                    tokenizeDocStream(documentString, freqMap);
                     
                     // Move postings to buffer
                     for (const auto& e : freqMap) {
@@ -73,7 +64,7 @@ int PostingGenerator::generatePostings() {
                     }
                     
                     // Clear the document stream for the next page
-                    documentStream.clear();
+                    documentString.clear();
                 }
                 
                 // Parse until end of header
@@ -91,8 +82,8 @@ int PostingGenerator::generatePostings() {
             } else {
                 // Append actual content of page to stream
                 getline(wetFile, line);
-                documentStream += '\n'; // prevent 'adaafasf'
-                documentStream += line;
+                documentString += '\n'; // prevent 'adaafasf'
+                documentString += line;
             }
         }
         wetFile.close();
@@ -224,10 +215,9 @@ inline bool PostingGenerator::isDelim(char c) {
     return false;
 }
 
-std::vector<std::string> PostingGenerator::tokenizeDocStream(const std::string& inputString) {
+void PostingGenerator::tokenizeDocStream(const std::string& inputString, std::map<std::string, unsigned>& frequencies) {
     std::stringstream stringStream(inputString);
     char c;
-    std::vector<std::string> wordVector;
     
     while (stringStream) {
         std::string word;
@@ -243,7 +233,15 @@ std::vector<std::string> PostingGenerator::tokenizeDocStream(const std::string& 
         if (isStrAlnum(word)) {
             // Normalize word by converting to lowercase
             transform(word.begin(), word.end(), word.begin(), ::tolower);
-            wordVector.push_back(word);
+            
+            // Update frequency
+            if (word.size() != 0) {
+                if (frequencies.find(word) == frequencies.end()) {
+                    frequencies[word] = 1;
+                } else {
+                    frequencies[word] += 1;
+                }
+            }
         }
         
         // Skip delims
@@ -251,5 +249,4 @@ std::vector<std::string> PostingGenerator::tokenizeDocStream(const std::string& 
         if (c != EOF)
             stringStream.unget();
     }
-    return wordVector;
 }

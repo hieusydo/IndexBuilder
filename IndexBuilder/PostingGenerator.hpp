@@ -68,7 +68,7 @@ private:
     // Split string into words by delimiters
     // and also normalize them along the way
     inline bool isDelim(char c);
-    std::vector<std::string> tokenizeDocStream(const std::string& inputString);
+    void tokenizeDocStream(const std::string& inputString, std::map<std::string, unsigned>& frequencies);
     
 public:
     // The constructor initialize the directory name and the buffer
