@@ -27,7 +27,6 @@ private:
     std::map<std::string, LexiconEntry> lexicon;
     
     // Buffer fields and methods to process intermediate file
-    // TODO: optimize with stringstream? ostringstream??
     size_t bufferSize;
     char* docBuffer;
     size_t currBufferPos;

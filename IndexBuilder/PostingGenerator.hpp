@@ -36,7 +36,6 @@ private:
     const std::string DELIMITERS = ";,:. \r\n\t";
     
     // Buffer fields and methods to process WET files
-    // TODO: optimize with stringstream? ostringstream??
     size_t bufferSize;
     char* docBuffer;
     size_t currBufferPos;

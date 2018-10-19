@@ -6,7 +6,6 @@
 //  Copyright © 2018 Hieu Do. All rights reserved.
 //
 
-//#include "common.hpp"
 #include <string>
 #include <iostream>
 #include "PostingGenerator.hpp"
@@ -16,9 +15,6 @@
 std::string invokeUnixUtil(int numPostings, size_t bufferSize);
 
 int main(int argc, const char * argv[]) {
-    /*
-     Run 1: 1155s - 197779 docs
-     */
     std::chrono::steady_clock::time_point beginMain = std::chrono::steady_clock::now();
     
     // Setting buffer size
@@ -47,9 +43,6 @@ int main(int argc, const char * argv[]) {
 
     std::chrono::steady_clock::time_point endMain = std::chrono::steady_clock::now();
     std::cout << "=====\nFinished IndexBuilder " << std::chrono::duration_cast<std::chrono::seconds>(endMain - beginMain).count() << "s.\n";
-    
-    // TODO: Test IndexBuilder: look up term -> inv list
-    
     return 0;
 }
 
@@ -72,8 +65,6 @@ std::string invokeUnixUtil(int numPostings, size_t bufferSize) {
         // Remember sorted files for merge
         sortedFiles += (sortFile + ' ');
     }
-    
-    // Delete intermediate files
     
     // Call Unix merge
     std::cout << "Merging all sorted files...\n";

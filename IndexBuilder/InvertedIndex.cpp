@@ -12,7 +12,6 @@ InvertedIndex::LexiconEntry::LexiconEntry() {} // for std::map
 InvertedIndex::LexiconEntry::LexiconEntry(unsigned p, unsigned s) : invListPos(p), invListLen(s) {}
 
 InvertedIndex::InvertedIndex(const std::string& index, const std::string& inter, size_t sz) : indexFn(index), interFn(inter), bufferSize(sz), docBuffer(new char[sz]), currBufferPos(0) {
-//    std::ofstream finalIndex(indexFn, std::ios::binary | std::ios::out);
     std::ifstream interFile(interFn);
     if (!interFile) {
         std::cerr << "Error opening " << interFn << '\n';

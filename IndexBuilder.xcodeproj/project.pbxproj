@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		74D6002821755C30003A2308 /* PostingGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 74D6002621755C30003A2308 /* PostingGenerator.cpp */; };
+		74D6002E21794979003A2308 /* VByteCompression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 74D6002C21794979003A2308 /* VByteCompression.cpp */; };
 		74E6382E216E6935003E64E1 /* InvertedIndex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 74E6382C216E6935003E64E1 /* InvertedIndex.cpp */; };
 		74E63832216E9125003E64E1 /* UrlTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 74E63830216E9125003E64E1 /* UrlTable.cpp */; };
 		74F3D911216D817700604DBE /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 74F3D910216D817700604DBE /* main.cpp */; };
@@ -28,6 +29,8 @@
 /* Begin PBXFileReference section */
 		74D6002621755C30003A2308 /* PostingGenerator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PostingGenerator.cpp; sourceTree = "<group>"; };
 		74D6002721755C30003A2308 /* PostingGenerator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = PostingGenerator.hpp; sourceTree = "<group>"; };
+		74D6002C21794979003A2308 /* VByteCompression.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = VByteCompression.cpp; sourceTree = "<group>"; };
+		74D6002D21794979003A2308 /* VByteCompression.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = VByteCompression.hpp; sourceTree = "<group>"; };
 		74E63828216DC519003E64E1 /* wet_files */ = {isa = PBXFileReference; lastKnownFileType = folder; path = wet_files; sourceTree = "<group>"; };
 		74E6382C216E6935003E64E1 /* InvertedIndex.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = InvertedIndex.cpp; sourceTree = "<group>"; };
 		74E6382D216E6935003E64E1 /* InvertedIndex.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = InvertedIndex.hpp; sourceTree = "<group>"; };
@@ -75,6 +78,8 @@
 				74E63831216E9125003E64E1 /* UrlTable.hpp */,
 				74D6002621755C30003A2308 /* PostingGenerator.cpp */,
 				74D6002721755C30003A2308 /* PostingGenerator.hpp */,
+				74D6002C21794979003A2308 /* VByteCompression.cpp */,
+				74D6002D21794979003A2308 /* VByteCompression.hpp */,
 			);
 			path = IndexBuilder;
 			sourceTree = "<group>";
@@ -135,6 +140,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				74D6002E21794979003A2308 /* VByteCompression.cpp in Sources */,
 				74E63832216E9125003E64E1 /* UrlTable.cpp in Sources */,
 				74E6382E216E6935003E64E1 /* InvertedIndex.cpp in Sources */,
 				74D6002821755C30003A2308 /* PostingGenerator.cpp in Sources */,
