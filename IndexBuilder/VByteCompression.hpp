@@ -11,10 +11,16 @@
 
 #include <vector>
 
-// TODO: https://nlp.stanford.edu/IR-book/html/htmledition/variable-byte-codes-1.html
+// Based on: https://nlp.stanford.edu/IR-book/html/htmledition/variable-byte-codes-1.html
+// TODO: use bit operators to optimize
 
-std::vector<char> encodeVbyte(size_t inputNum);
+// Return the encoded bytes of a number n
+std::vector<unsigned char> encodeNumVB(size_t n);
 
-size_t decodeVbyte(std::vector<char> encodedBytes);
+// Return a stream of encoded bytes of all the input numbers
+std::vector<unsigned char> encodeVB(const std::vector<size_t>& numbers);
+
+// Return all decoded numbers from a stream of encoded bytes
+std::vector<size_t> decodeVB(const std::vector<char>& bytestream);
 
 #endif /* VByteCompression_hpp */
