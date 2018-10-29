@@ -25,9 +25,6 @@ int PostingGenerator::generatePostings() {
     // Flag to skip all intro data till first "WARC/1.0" with actual page
     bool skipIntro = true;
     
-    std::ios_base::sync_with_stdio(false);
-    std::cin.tie(NULL);
-    
     std::vector<std::string> allFiles = getAllFiles();
     for (const std::string& filename : allFiles) {
         
