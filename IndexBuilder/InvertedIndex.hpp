@@ -12,6 +12,7 @@
 #include <string>
 #include <map>
 #include "PostingGenerator.hpp"
+#include "VByteCompression.hpp"
 
 class InvertedIndex {
     struct LexiconEntry {
@@ -33,9 +34,6 @@ private:
     
     // Extract a string from i to the next blank space
     std::string getStrFromBuffer(size_t& i);
-    
-    // Append the string to buffer[currBufferPos]
-    void putStrToBuffer(const std::string& aStr);
 
     // Write everything in buffer to the lastIndexPos byte of the final index
     void writeBufferToIndex(unsigned& lastIndexPos);

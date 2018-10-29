@@ -39,12 +39,6 @@ private:
     size_t bufferSize;
     char* docBuffer;
     size_t currBufferPos;
-
-    // Extract a string from i to the next blank space
-    std::string getStrFromBuffer(size_t& i);
-    
-    // Append the string to buffer[currBufferPos]
-    void putStrToBuffer(const std::string& aStr);
     
     // Write everything in buffer to the lastIndexPos byte of the final index
     void flushBuffer(int& fileCnt);

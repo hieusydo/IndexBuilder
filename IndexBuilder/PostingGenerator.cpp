@@ -25,6 +25,9 @@ int PostingGenerator::generatePostings() {
     // Flag to skip all intro data till first "WARC/1.0" with actual page
     bool skipIntro = true;
     
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+    
     std::vector<std::string> allFiles = getAllFiles();
     for (const std::string& filename : allFiles) {
         
@@ -100,39 +103,10 @@ int PostingGenerator::generatePostings() {
     return fileCnt;
 }
 
-std::string PostingGenerator::getStrFromBuffer(size_t& i) {
-    if (i > bufferSize) {
-        std::cerr << "Bad access getStrFromBuffer\n";
-        exit(1);
-    }
-    std::string res = "";
-    while (docBuffer[i] != ' ') {
-        res += docBuffer[i++];
-    }
-    i++;
-    return res;
-}
-
-void PostingGenerator::putStrToBuffer(const std::string& aStr) {
-    if (currBufferPos > bufferSize) {
-        std::cerr << "Bad here putStrToBuffer\n";
-        exit(1);
-    }
-    for (char c : aStr)
-        docBuffer[currBufferPos++] = c;
-    docBuffer[currBufferPos++] = ' ';
-}
-
 void PostingGenerator::flushBuffer(int& fileCnt) {
     std::cout << "Buffer is full.. Writing intermediate file...\n";
     std::ofstream interFile(std::to_string(fileCnt++), std::ios::binary | std::ios::out);
-    size_t i = 0;
-    while (i < currBufferPos) {
-        std::string term = getStrFromBuffer(i);
-        size_t docId = stoi(getStrFromBuffer(i));
-        size_t freq = stoi(getStrFromBuffer(i));
-        interFile << term << ' ' << docId << ' ' << freq << '\n';
-    }
+    interFile.write((const char*)&docBuffer[0], currBufferPos);
     interFile.close();
     // Reset buffer
     memset(docBuffer, 0, bufferSize);
@@ -144,9 +118,13 @@ void PostingGenerator::putPostingToBuffer(const Posting& aPosting, int& fileCnt)
     if (aPosting.size() + currBufferPos > bufferSize) {
         flushBuffer(fileCnt);
     }
-    putStrToBuffer(aPosting.term);
-    putStrToBuffer(std::to_string(aPosting.docId));
-    putStrToBuffer(std::to_string(aPosting.frequency));
+    std::string posting = aPosting.term + ' ' + std::to_string(aPosting.docId) + ' ' + std::to_string(aPosting.frequency) + '\n';
+    int numWritten = sprintf(docBuffer+currBufferPos, "%s", posting.c_str());
+    if (numWritten != posting.size()) {
+        std::cerr << "Failed to write\n";
+        exit(1);
+    }
+    currBufferPos += numWritten;
 }
 
 void PostingGenerator::parseWetHeader(const std::string& line, std::string& documentUri, int& documentLen) {

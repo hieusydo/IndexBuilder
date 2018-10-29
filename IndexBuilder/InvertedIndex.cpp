@@ -48,14 +48,16 @@ void InvertedIndex::writeBufferToIndex(unsigned& lastIndexPos) {
 
     size_t i = 0;
     while (i < currBufferPos) {
+        // TODO: get all (docId, freq) of a term before writing
         std::string term = getStrFromBuffer(i);
         size_t docId = stoi(getStrFromBuffer(i));
         size_t freq = stoi(getStrFromBuffer(i));
+        // Var byte compress docId and freq
+        std::vector<char> encodedPosting = encodeVB({docId, freq});
+        unsigned entryLen = (unsigned int) (sizeof(char) * encodedPosting.size());
         // Update inverted lists
-        finalIndex.write(reinterpret_cast<const char *>(&docId), sizeof(docId));
-        finalIndex.write(reinterpret_cast<const char *>(&freq), sizeof(freq));
+        finalIndex.write((char*)&encodedPosting[0], entryLen);
         // Update lexicon
-        unsigned entryLen = sizeof(docId) + sizeof(freq);
         if (lexicon.find(term)!= lexicon.end()) {
             lexicon[term].invListLen += entryLen;
         } else {
@@ -75,9 +77,13 @@ void InvertedIndex::readPostingToBuffer(const Posting& aPosting, unsigned& lastI
     if (aPosting.size() + currBufferPos > bufferSize) {
         writeBufferToIndex(lastIndexPos);
     }
-    putStrToBuffer(aPosting.term);
-    putStrToBuffer(std::to_string(aPosting.docId));
-    putStrToBuffer(std::to_string(aPosting.frequency));
+    std::string posting = aPosting.term + ' ' + std::to_string(aPosting.docId) + ' ' + std::to_string(aPosting.frequency) + ' ';
+    int numWritten = sprintf(docBuffer+currBufferPos, "%s", posting.c_str());
+    if (numWritten != posting.size()) {
+        std::cerr << "Failed to write\n";
+        exit(1);
+    }
+    currBufferPos += numWritten;
 }
 
 
@@ -103,14 +109,4 @@ std::string InvertedIndex::getStrFromBuffer(size_t& i) {
     }
     i++;
     return res;
-}
-
-void InvertedIndex::putStrToBuffer(const std::string& aStr) {
-    if (currBufferPos > bufferSize) {
-        std::cerr << "Bad here putStrToBuffer\n";
-        exit(1);
-    }
-    for (char c : aStr)
-        docBuffer[currBufferPos++] = c;
-    docBuffer[currBufferPos++] = ' ';
 }

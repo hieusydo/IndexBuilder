@@ -16,7 +16,7 @@ std::string invokeUnixUtil(int numPostings, size_t bufferSize);
 
 int main(int argc, const char * argv[]) {
     std::chrono::steady_clock::time_point beginMain = std::chrono::steady_clock::now();
-    
+
     // Setting buffer size
     size_t bufferSize = 500000000;
     if (argc < 2) {
@@ -28,7 +28,7 @@ int main(int argc, const char * argv[]) {
         std::cerr << "Arguments not supported.\n";
         exit(1);
     }
-    
+
     // 1. Generate postings from WET files
     int numPostings = PostingGenerator("wet_files", bufferSize).generatePostings();
 
@@ -43,6 +43,7 @@ int main(int argc, const char * argv[]) {
 
     std::chrono::steady_clock::time_point endMain = std::chrono::steady_clock::now();
     std::cout << "=====\nFinished IndexBuilder " << std::chrono::duration_cast<std::chrono::seconds>(endMain - beginMain).count() << "s.\n";
+    
     return 0;
 }
 
