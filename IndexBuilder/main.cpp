@@ -50,7 +50,9 @@ int main(int argc, const char * argv[]) {
 std::string invokeUnixUtil(int numPostings, size_t bufferSize) {    
     std::string res = "merged";
     
-    std::string baseCmd = "sort -S " + std::to_string(bufferSize) + "b -k1,1 -k2n ";
+//    std::string baseCmd = "sort -S " + std::to_string(bufferSize) + "b -k1,1 -k2n ";
+    std::string baseCmd = "sort -k1,1 -k2n ";
+    
     std::string sortedFiles;
     while (--numPostings >= 0) {
         std::string file = std::to_string(numPostings);
@@ -63,6 +65,10 @@ std::string invokeUnixUtil(int numPostings, size_t bufferSize) {
         std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
         std::cout << "Finished sorting an intermediate file " << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << "s.\n";
         
+        // Remove unsorted file
+        std::string rmCmd = "rm -f " + std::to_string(numPostings);
+        system(rmCmd.c_str());
+        
         // Remember sorted files for merge
         sortedFiles += (sortFile + ' ');
     }
@@ -74,6 +80,10 @@ std::string invokeUnixUtil(int numPostings, size_t bufferSize) {
     system(mergeCmd.c_str());
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
     std::cout << "Finished merging " << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << "s.\n";
+    
+    // Remove sorted files
+    std::string rmCmd = "rm -f " + sortedFiles;
+    system(rmCmd.c_str());
     
     return res;
 }

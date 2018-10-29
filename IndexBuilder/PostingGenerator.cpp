@@ -81,7 +81,6 @@ int PostingGenerator::generatePostings() {
                 continue;
             } else {
                 // Append actual content of page to stream
-                getline(wetFile, line);
                 documentString += '\n'; // prevent 'adaafasf'
                 documentString += line;
             }
@@ -155,7 +154,7 @@ std::vector<std::string> PostingGenerator::getAllFiles() {
         while ((ent = readdir (dir)) != NULL) {
             std::string fn = std::string(ent->d_name);
             // Only return WET files
-            if (fn.find("warc.wet") != std::string::npos) {
+            if (fn.find("warc.wet") != std::string::npos && fn.find(".gz") == std::string::npos) {
                 allFiles.push_back(fn);
             }
         }
