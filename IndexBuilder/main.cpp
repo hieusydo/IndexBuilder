@@ -41,6 +41,9 @@ int main(int argc, const char * argv[]) {
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
     std::cout << "Finished generating final index " << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << "s.\n";
 
+    // Clean up merged file
+    system("rm -f merged");
+    
     std::chrono::steady_clock::time_point endMain = std::chrono::steady_clock::now();
     std::cout << "=====\nFinished IndexBuilder " << std::chrono::duration_cast<std::chrono::seconds>(endMain - beginMain).count() << "s.\n";
     
