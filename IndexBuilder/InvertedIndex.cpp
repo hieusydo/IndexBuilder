@@ -9,9 +9,9 @@
 #include "InvertedIndex.hpp"
 
 InvertedIndex::LexiconEntry::LexiconEntry() {} // for std::map
-InvertedIndex::LexiconEntry::LexiconEntry(unsigned p, unsigned s) : invListPos(p), invListLen(s) {}
+InvertedIndex::LexiconEntry::LexiconEntry(unsigned p, unsigned s) : invListPos(p), metadataSize(s) {}
 
-InvertedIndex::InvertedIndex(const std::string& index, const std::string& inter, size_t sz) : indexFn(index), interFn(inter), bufferSize(sz), docBuffer(new char[sz]), currBufferPos(0) {
+InvertedIndex::InvertedIndex(const std::string& index, const std::string& inter) : indexFn(index), interFn(inter) {
     std::ifstream interFile(interFn);
     if (!interFile) {
         std::cerr << "Error opening " << interFn << '\n';
@@ -20,72 +20,93 @@ InvertedIndex::InvertedIndex(const std::string& index, const std::string& inter,
     
     // Last write position in the final index file
     unsigned lastIndexPos = 0;
+    
+    std::ofstream finalIndex(indexFn, std::ios::binary | std::ios::out);
 
+    std::string currTerm;
+    unsigned currDocId;
+    unsigned currFreq;
+    interFile >> currTerm >> currDocId >> currFreq;
+    std::vector<std::pair<unsigned, unsigned>> allCurrPostings;
+    allCurrPostings.push_back(std::make_pair(currDocId, currFreq));
+    
     std::string term;
     unsigned docId;
     unsigned freq;
     while (interFile >> term >> docId >> freq) {
-        Posting newPosting(term, docId, freq);
-        // TODO (optional): format postings for query processing
-        // TODO (optional): varbyte compression
-        readPostingToBuffer(newPosting, lastIndexPos);
+        if (currTerm == term) {
+            allCurrPostings.push_back(std::make_pair(docId, freq));
+        } else {
+            // write out allCurrPostings
+            std::vector<char> invList;
+            std::vector<char> allChunks;
+
+            // Metadata info
+            std::vector<size_t> chunkSize;
+            std::vector<size_t> lastDid;
+
+            // Chunk compression
+            std::vector<size_t> didChunk;
+            std::vector<size_t> freqChunk;
+            for(size_t i = 0; i < allCurrPostings.size(); ++i) {
+                didChunk.push_back(allCurrPostings[i].first);
+                freqChunk.push_back(allCurrPostings[i].second);
+                if (didChunk.size() == 128 || i + 1 == allCurrPostings.size()) {
+                    
+                    // Compress
+                    std::vector<char> didEncoded = encodeVB(didChunk);
+                    std::vector<char> freqEncoded = encodeVB(freqChunk);
+                    
+                    // Update metadata
+                    lastDid.push_back(didChunk.back());
+                    chunkSize.push_back(didEncoded.size());
+                    chunkSize.push_back(freqEncoded.size());
+                    
+                    // Extend the chunks
+                    allChunks.reserve(allChunks.size() + didEncoded.size() + freqEncoded.size());
+                    allChunks.insert(allChunks.end(), didEncoded.begin(), didEncoded.end());
+                    allChunks.insert(allChunks.end(), freqEncoded.begin(), freqEncoded.end());
+                    
+                    // Clear to process next chunk
+                    didChunk.clear();
+                    freqChunk.clear();
+                }
+            }
+            
+            std::vector<char> chunkSizeLen = encodeNumVB(chunkSize.size());
+            std::vector<char> chunkSizeEncoded = encodeVB(chunkSize);
+            
+            std::vector<char> lastDidLen = encodeNumVB(lastDid.size());
+            std::vector<char> lastDidEncoded = encodeVB(lastDid);
+            
+            
+            invList.reserve(chunkSizeLen.size() + chunkSizeEncoded.size() + lastDidLen.size() + lastDidEncoded.size() + allChunks.size());
+            invList.insert(invList.end(), chunkSizeLen.begin(), chunkSizeLen.end());
+            invList.insert(invList.end(), chunkSizeEncoded.begin(), chunkSizeEncoded.end());
+            invList.insert(invList.end(), lastDidLen.begin(), lastDidLen.end());
+            invList.insert(invList.end(), lastDidEncoded.begin(), lastDidEncoded.end());
+            invList.insert(invList.end(), allChunks.begin(), allChunks.end());
+            
+            // Update lexicon and write chunk-divided inv list
+            unsigned metadataLen = (unsigned) (chunkSizeLen.size() + chunkSizeEncoded.size() + lastDidLen.size() + lastDidEncoded.size());
+            lexicon[currTerm] = LexiconEntry(lastIndexPos, metadataLen);
+            
+            finalIndex.seekp(lastIndexPos);
+            unsigned entryLen = (unsigned)invList.size();
+            finalIndex.write((char*)&invList[0], entryLen);
+            lastIndexPos += entryLen;
+            
+            // Reset allCurrPostings with the new term
+            allCurrPostings.clear();
+            currTerm = term;
+            allCurrPostings.push_back(std::make_pair(docId, freq));
+        }
     }
     interFile.close();
-
-    writeBufferToIndex(lastIndexPos);
+    finalIndex.close();
+    
     writeLexiconToDisk("lexicon");
 }
-
-InvertedIndex::~InvertedIndex() {
-    delete [] docBuffer;
-}
-
-void InvertedIndex::writeBufferToIndex(unsigned& lastIndexPos) {
-    std::cout << "Buffer is full.. Writing final index...\n";
-    
-    std::ofstream finalIndex(indexFn, std::ios::binary | std::ios::out);
-    finalIndex.seekp(lastIndexPos);
-
-    size_t i = 0;
-    while (i < currBufferPos) {
-        // TODO: get all (docId, freq) of a term before writing
-        std::string term = getStrFromBuffer(i);
-        size_t docId = stoi(getStrFromBuffer(i));
-        size_t freq = stoi(getStrFromBuffer(i));
-        // Var byte compress docId and freq
-        std::vector<char> encodedPosting = encodeVB({docId, freq});
-        unsigned entryLen = (unsigned int) (sizeof(char) * encodedPosting.size());
-        // Update inverted lists
-        finalIndex.write((char*)&encodedPosting[0], entryLen);
-        // Update lexicon
-        if (lexicon.find(term)!= lexicon.end()) {
-            lexicon[term].invListLen += entryLen;
-        } else {
-            lexicon[term] = LexiconEntry(lastIndexPos, entryLen);
-        }
-        lastIndexPos += entryLen;
-    }
-    finalIndex.close();
-
-    //Reset buffer
-    memset(docBuffer, 0, bufferSize);
-    currBufferPos = 0;
-}
-
-void InvertedIndex::readPostingToBuffer(const Posting& aPosting, unsigned& lastIndexPos) {
-    // If buffer is full, clear it out first
-    if (aPosting.size() + currBufferPos > bufferSize) {
-        writeBufferToIndex(lastIndexPos);
-    }
-    std::string posting = aPosting.term + ' ' + std::to_string(aPosting.docId) + ' ' + std::to_string(aPosting.frequency) + ' ';
-    int numWritten = sprintf(docBuffer+currBufferPos, "%s", posting.c_str());
-    if (numWritten != posting.size()) {
-        std::cerr << "Failed to write\n";
-        exit(1);
-    }
-    currBufferPos += numWritten;
-}
-
 
 void InvertedIndex::writeLexiconToDisk(const std::string& pathname) const {
     std::ofstream ofs(pathname);
@@ -94,19 +115,6 @@ void InvertedIndex::writeLexiconToDisk(const std::string& pathname) const {
         exit(1);
     }
     for (const auto& e : lexicon)
-        ofs << e.first << ' ' << e.second.invListPos << ' ' << e.second.invListLen << '\n';
+        ofs << e.first << ' ' << e.second.invListPos << ' ' << e.second.metadataSize << '\n';
     ofs.close();
-}
-
-std::string InvertedIndex::getStrFromBuffer(size_t& i) {
-    if (i > bufferSize) {
-        std::cerr << "Bad access getStrFromBuffer\n";
-        exit(1);
-    }
-    std::string res = "";
-    while (docBuffer[i] != ' ') {
-        res += docBuffer[i++];
-    }
-    i++;
-    return res;
 }

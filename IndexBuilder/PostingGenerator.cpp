@@ -59,7 +59,7 @@ int PostingGenerator::generatePostings() {
                     
                     // Move postings to buffer
                     for (const auto& e : freqMap) {
-                        Posting newPosting = Posting(e.first, static_cast<unsigned>(urlTable.size()), e.second);
+                        Posting newPosting = Posting(e.first, static_cast<unsigned>(urlTable.size() - 1), e.second);
                         putPostingToBuffer(newPosting, fileCnt);
                     }
                     
