@@ -19,13 +19,13 @@
 // TODO: use bit operators to optimize
 
 // Return the encoded bytes of a number n
-std::vector<char> encodeNumVB(size_t n);
+std::vector<unsigned char> encodeNumVB(size_t n);
 
 // Return a stream of encoded bytes of all the input numbers
-std::vector<char> encodeVB(const std::vector<size_t>& numbers);
+std::vector<unsigned char> encodeVB(const std::vector<size_t>& numbers);
 
 // Return all decoded numbers from a stream of encoded bytes
-std::vector<size_t> decodeVB(const std::vector<char>& bytestream);
+std::vector<size_t> decodeVB(const std::vector<unsigned char>& bytestream);
 
 // Trivial test function to generate files with encoded vs. non-encoded numbers
 // Goal is to see that encoded files are smaller

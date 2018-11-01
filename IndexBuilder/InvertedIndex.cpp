@@ -54,8 +54,8 @@ InvertedIndex::InvertedIndex(const std::string& index, const std::string& inter)
                 if (didChunk.size() == 128 || i + 1 == allCurrPostings.size()) {
                     
                     // Compress
-                    std::vector<char> didEncoded = encodeVB(didChunk);
-                    std::vector<char> freqEncoded = encodeVB(freqChunk);
+                    std::vector<unsigned char> didEncoded = encodeVB(didChunk);
+                    std::vector<unsigned char> freqEncoded = encodeVB(freqChunk);
                     
                     // Update metadata
                     lastDid.push_back(didChunk.back());
@@ -73,11 +73,11 @@ InvertedIndex::InvertedIndex(const std::string& index, const std::string& inter)
                 }
             }
             
-            std::vector<char> chunkSizeLen = encodeNumVB(chunkSize.size());
-            std::vector<char> chunkSizeEncoded = encodeVB(chunkSize);
+            std::vector<unsigned char> chunkSizeLen = encodeNumVB(chunkSize.size());
+            std::vector<unsigned char> chunkSizeEncoded = encodeVB(chunkSize);
             
-            std::vector<char> lastDidLen = encodeNumVB(lastDid.size());
-            std::vector<char> lastDidEncoded = encodeVB(lastDid);
+            std::vector<unsigned char> lastDidLen = encodeNumVB(lastDid.size());
+            std::vector<unsigned char> lastDidEncoded = encodeVB(lastDid);
             
             
             invList.reserve(chunkSizeLen.size() + chunkSizeEncoded.size() + lastDidLen.size() + lastDidEncoded.size() + allChunks.size());
@@ -93,7 +93,7 @@ InvertedIndex::InvertedIndex(const std::string& index, const std::string& inter)
             
             finalIndex.seekp(lastIndexPos);
             unsigned entryLen = (unsigned)invList.size();
-            finalIndex.write((char*)&invList[0], entryLen);
+            finalIndex.write((const char*)&invList[0], entryLen);
             lastIndexPos += entryLen;
             
             // Reset allCurrPostings with the new term
