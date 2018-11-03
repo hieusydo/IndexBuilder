@@ -30,10 +30,13 @@ int main(int argc, const char * argv[]) {
     }
 
     // 1. Generate postings from WET files
-    int numPostings = PostingGenerator("wet_files", bufferSize).generatePostings();
+//    int numPostings = PostingGenerator("/Volumes/BACKUP/", bufferSize).generatePostings();
+    int numPostings = PostingGenerator("wet_files/", bufferSize).generatePostings();
 
     // 2. Sort and merge intermediate postings
     std::string interFn = invokeUnixUtil(numPostings, bufferSize);
+
+//    std::string interFn = "merged";
 
     // 3. Generate final index
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
@@ -42,8 +45,9 @@ int main(int argc, const char * argv[]) {
     std::cout << "Finished generating final index " << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << "s.\n";
 
     // Clean up merged file
+//    system("mv merged /Volumes/BACKUP/");
     system("rm -f merged");
-    
+
     std::chrono::steady_clock::time_point endMain = std::chrono::steady_clock::now();
     std::cout << "=====\nFinished IndexBuilder " << std::chrono::duration_cast<std::chrono::seconds>(endMain - beginMain).count() << "s.\n";
     
