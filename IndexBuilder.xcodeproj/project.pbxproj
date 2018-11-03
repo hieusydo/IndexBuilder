@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7456B968218D2CA800324D83 /* DocumentStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7456B966218D2CA800324D83 /* DocumentStore.cpp */; };
+		7456B977218D43A600324D83 /* libtacopie.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7456B976218D43A600324D83 /* libtacopie.a */; };
+		7456B979218D48D400324D83 /* libcpp_redis.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7456B978218D48D300324D83 /* libcpp_redis.a */; };
 		74D6002821755C30003A2308 /* PostingGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 74D6002621755C30003A2308 /* PostingGenerator.cpp */; };
 		74D6002E21794979003A2308 /* VByteCompression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 74D6002C21794979003A2308 /* VByteCompression.cpp */; };
 		74E6382E216E6935003E64E1 /* InvertedIndex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 74E6382C216E6935003E64E1 /* InvertedIndex.cpp */; };
@@ -27,6 +30,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		7456B966218D2CA800324D83 /* DocumentStore.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DocumentStore.cpp; sourceTree = "<group>"; };
+		7456B967218D2CA800324D83 /* DocumentStore.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = DocumentStore.hpp; sourceTree = "<group>"; };
+		7456B976218D43A600324D83 /* libtacopie.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtacopie.a; path = ../../../cpp_redis/build/lib/libtacopie.a; sourceTree = "<group>"; };
+		7456B978218D48D300324D83 /* libcpp_redis.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcpp_redis.a; path = ../../../cpp_redis/build/lib/libcpp_redis.a; sourceTree = "<group>"; };
 		74D6002621755C30003A2308 /* PostingGenerator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PostingGenerator.cpp; sourceTree = "<group>"; };
 		74D6002721755C30003A2308 /* PostingGenerator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = PostingGenerator.hpp; sourceTree = "<group>"; };
 		74D6002C21794979003A2308 /* VByteCompression.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = VByteCompression.cpp; sourceTree = "<group>"; };
@@ -45,17 +52,29 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7456B977218D43A600324D83 /* libtacopie.a in Frameworks */,
+				7456B979218D48D400324D83 /* libcpp_redis.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7456B969218D2F0900324D83 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				7456B978218D48D300324D83 /* libcpp_redis.a */,
+				7456B976218D43A600324D83 /* libtacopie.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		74F3D904216D817700604DBE = {
 			isa = PBXGroup;
 			children = (
 				74F3D90F216D817700604DBE /* IndexBuilder */,
 				74F3D90E216D817700604DBE /* Products */,
+				7456B969218D2F0900324D83 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -80,6 +99,8 @@
 				74D6002721755C30003A2308 /* PostingGenerator.hpp */,
 				74D6002C21794979003A2308 /* VByteCompression.cpp */,
 				74D6002D21794979003A2308 /* VByteCompression.hpp */,
+				7456B967218D2CA800324D83 /* DocumentStore.hpp */,
+				7456B966218D2CA800324D83 /* DocumentStore.cpp */,
 			);
 			path = IndexBuilder;
 			sourceTree = "<group>";
@@ -140,6 +161,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7456B968218D2CA800324D83 /* DocumentStore.cpp in Sources */,
 				74D6002E21794979003A2308 /* VByteCompression.cpp in Sources */,
 				74E63832216E9125003E64E1 /* UrlTable.cpp in Sources */,
 				74E6382E216E6935003E64E1 /* InvertedIndex.cpp in Sources */,
@@ -267,6 +289,11 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CODE_SIGN_STYLE = Automatic;
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				LIBRARY_SEARCH_PATHS = (
+					"/Users/hieudosy/cpp_redis/build/lib\n/Users/hieudosy/cpp_redis/build/lib\n/Users/hieudosy/cpp_redis/build/lib\n/Users/hieudosy/cpp_redis/build/lib\n",
+				);
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -277,6 +304,11 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CODE_SIGN_STYLE = Automatic;
 				GCC_OPTIMIZATION_LEVEL = fast;
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				LIBRARY_SEARCH_PATHS = (
+					"/Users/hieudosy/cpp_redis/build/lib\n/Users/hieudosy/cpp_redis/build/lib\n/Users/hieudosy/cpp_redis/build/lib\n/Users/hieudosy/cpp_redis/build/lib\n",
+				);
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

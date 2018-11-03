@@ -18,6 +18,7 @@ int PostingGenerator::generatePostings() {
     int fileCnt = 0;
     
     UrlTable urlTable;
+    DocumentStore docStore;
     
     std::string documentString;
     std::string documentUri;
@@ -53,6 +54,9 @@ int PostingGenerator::generatePostings() {
                 
                 // Generate intermediate posting once a page is parsed
                 if (!documentString.empty()) {
+                    // 
+                    docStore.putDocument(urlTable.size() - 1, documentString);
+                    
                     // Count frequency
                     std::map<std::string, unsigned> freqMap;
                     tokenizeDocStream(documentString, freqMap);

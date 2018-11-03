@@ -15,6 +15,7 @@
 #include <map>
 #include <dirent.h>
 #include "UrlTable.hpp"
+#include "DocumentStore.hpp"
 
 struct Posting {
     Posting(const std::string& t, unsigned id, unsigned f)
@@ -23,8 +24,8 @@ struct Posting {
     size_t size() const;
     
     std::string term;
-    unsigned docId; // also rowLen in UrlTable
-    unsigned frequency;
+    size_t docId; // also rowLen in UrlTable
+    size_t frequency;
 };
 
 class PostingGenerator {
