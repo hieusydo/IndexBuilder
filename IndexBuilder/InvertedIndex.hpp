@@ -17,9 +17,9 @@
 class InvertedIndex {
     struct LexiconEntry {
         LexiconEntry(); // for std::map
-        LexiconEntry(unsigned p, unsigned s);
-        unsigned invListPos;
-        unsigned metadataSize;
+        LexiconEntry(size_t p, size_t s);
+        size_t invListPos;
+        size_t metadataSize;
     };
     
 private:

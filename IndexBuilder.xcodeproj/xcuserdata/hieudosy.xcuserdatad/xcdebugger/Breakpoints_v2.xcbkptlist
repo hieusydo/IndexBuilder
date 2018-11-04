@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "IndexBuilder/InvertedIndex.cpp"
-            timestampString = "562910208.222049"
+            timestampString = "562976427.002313"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "134"
-            endingLineNumber = "134"
+            startingLineNumber = "52"
+            endingLineNumber = "52"
             landmarkName = "InvertedIndex::InvertedIndex(const std::string&amp; index, const std::string&amp; inter)"
             landmarkType = "7">
          </BreakpointContent>
@@ -26,43 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "IndexBuilder/InvertedIndex.cpp"
-            timestampString = "562910208.222149"
+            timestampString = "562976427.002393"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "148"
-            endingLineNumber = "148"
-            landmarkName = "InvertedIndex::InvertedIndex(const std::string&amp; index, const std::string&amp; inter)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "IndexBuilder/InvertedIndex.cpp"
-            timestampString = "562910208.222205"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "154"
-            endingLineNumber = "154"
-            landmarkName = "InvertedIndex::InvertedIndex(const std::string&amp; index, const std::string&amp; inter)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "IndexBuilder/InvertedIndex.cpp"
-            timestampString = "562910208.2222511"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "173"
-            endingLineNumber = "173"
+            startingLineNumber = "58"
+            endingLineNumber = "58"
             landmarkName = "InvertedIndex::InvertedIndex(const std::string&amp; index, const std::string&amp; inter)"
             landmarkType = "7">
          </BreakpointContent>

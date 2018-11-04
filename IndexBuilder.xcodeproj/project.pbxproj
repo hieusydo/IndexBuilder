@@ -290,9 +290,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CODE_SIGN_STYLE = Automatic;
 				HEADER_SEARCH_PATHS = /usr/local/include;
-				LIBRARY_SEARCH_PATHS = (
-					"/Users/hieudosy/cpp_redis/build/lib\n/Users/hieudosy/cpp_redis/build/lib\n/Users/hieudosy/cpp_redis/build/lib\n/Users/hieudosy/cpp_redis/build/lib\n",
-				);
+				LIBRARY_SEARCH_PATHS = /Users/hieudosy/cpp_redis/build/lib;
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -305,9 +303,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				GCC_OPTIMIZATION_LEVEL = fast;
 				HEADER_SEARCH_PATHS = /usr/local/include;
-				LIBRARY_SEARCH_PATHS = (
-					"/Users/hieudosy/cpp_redis/build/lib\n/Users/hieudosy/cpp_redis/build/lib\n/Users/hieudosy/cpp_redis/build/lib\n/Users/hieudosy/cpp_redis/build/lib\n",
-				);
+				LIBRARY_SEARCH_PATHS = /Users/hieudosy/cpp_redis/build/lib;
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
