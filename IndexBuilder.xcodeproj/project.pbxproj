@@ -291,7 +291,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				HEADER_SEARCH_PATHS = /usr/local/include;
 				LIBRARY_SEARCH_PATHS = /Users/hieudosy/cpp_redis/build/lib;
-				OTHER_LDFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-L/Users/hieudosy/cpp_redis/build/lib",
+					"-lcpp_redis",
+					"-lsqlite3",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -304,7 +308,11 @@
 				GCC_OPTIMIZATION_LEVEL = fast;
 				HEADER_SEARCH_PATHS = /usr/local/include;
 				LIBRARY_SEARCH_PATHS = /Users/hieudosy/cpp_redis/build/lib;
-				OTHER_LDFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-L/Users/hieudosy/cpp_redis/build/lib",
+					"-lcpp_redis",
+					"-lsqlite3",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

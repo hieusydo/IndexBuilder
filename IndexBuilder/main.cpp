@@ -10,6 +10,7 @@
 #include <iostream>
 #include "PostingGenerator.hpp"
 #include "InvertedIndex.hpp"
+#include "DocumentStore.hpp"
 
 // Calling Unix sort util to sort and merge intermediate postings
 std::string invokeUnixUtil(int numPostings, size_t bufferSize);
@@ -30,8 +31,8 @@ int main(int argc, const char * argv[]) {
     }
 
     // 1. Generate postings from WET files
-    int numPostings = PostingGenerator("/Volumes/BACKUP/", bufferSize).generatePostings();
-//    int numPostings = PostingGenerator("wet_files/", bufferSize).generatePostings();
+//    int numPostings = PostingGenerator("/Volumes/BACKUP/", bufferSize).generatePostings();
+    int numPostings = PostingGenerator("wet_files/", bufferSize).generatePostings();
 
 
     // 2. Sort and merge intermediate postings

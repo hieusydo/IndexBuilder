@@ -18,7 +18,8 @@ int PostingGenerator::generatePostings() {
     int fileCnt = 0;
     
     UrlTable urlTable;
-    DocumentStore docStore;
+    DocumentStore docStore("sqlite");
+    docStore.createTable();
     
     std::string documentString;
     std::string documentUri;
@@ -54,18 +55,18 @@ int PostingGenerator::generatePostings() {
                 
                 // Generate intermediate posting once a page is parsed
                 if (!documentString.empty()) {
-                    // 
+                    // Store document to use in snippet generation
                     docStore.putDocument(urlTable.size() - 1, documentString);
                     
-                    // Count frequency
-                    std::map<std::string, unsigned> freqMap;
-                    tokenizeDocStream(documentString, freqMap);
-                    
-                    // Move postings to buffer
-                    for (const auto& e : freqMap) {
-                        Posting newPosting = Posting(e.first, static_cast<unsigned>(urlTable.size() - 1), e.second);
-                        putPostingToBuffer(newPosting, fileCnt);
-                    }
+//                    // Count frequency
+//                    std::map<std::string, unsigned> freqMap;
+//                    tokenizeDocStream(documentString, freqMap);
+//
+//                    // Move postings to buffer
+//                    for (const auto& e : freqMap) {
+//                        Posting newPosting = Posting(e.first, static_cast<unsigned>(urlTable.size() - 1), e.second);
+//                        putPostingToBuffer(newPosting, fileCnt);
+//                    }
                     
                     // Clear the document stream for the next page
                     documentString.clear();
@@ -100,6 +101,8 @@ int PostingGenerator::generatePostings() {
     
     // Write urlTable to disk
     urlTable.writeToDisk("urlTable");
+    docStore.close();
+    
     return fileCnt;
 }
 
