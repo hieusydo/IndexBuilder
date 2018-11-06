@@ -38,7 +38,7 @@ std::vector<size_t> decodeVB(const std::vector<unsigned char>& bytestream) {
     for (unsigned char aByte : bytestream) {
         uint8_t intByte = (uint8_t)aByte;
         // cout << (unsigned)thisByte << endl;
-        if (intByte > 128) {
+        if (intByte >= 128) {
             // ignore continuation bit 1 by - 128
             n = 128 * n + (intByte - 128);
         } else {
@@ -48,28 +48,4 @@ std::vector<size_t> decodeVB(const std::vector<unsigned char>& bytestream) {
         }
     }
     return numbers;
-}
-
-void testVBCompression() {
-    std::vector<size_t> numbers = {34, 144, 113, 162};
-    std::vector<unsigned char> encoded = encodeVB(numbers);
-    std::ios_base::sync_with_stdio(false);
-    
-    // Write encoded numbers
-    // Use xxd -b testwrite to view in bits
-    std::ofstream ofs("testwrite", std::ios::binary | std::ios::out);
-//    for (const unsigned char e : encoded) {
-//        std::cout << std::bitset<8>(e) << '\n';
-//        ofs.write(&e, sizeof(e));
-//    }
-    ofs.write((const char *)&encoded[0], encoded.size());
-    ofs.close();
-    
-    // Write non-encoded numbers
-    // xxd testwrite-novb to view in hex
-    std::ofstream ofsa("testwrite-novb", std::ios::binary | std::ios::out);
-    for (size_t n : numbers) {
-        ofsa.write(reinterpret_cast<const char *>(&n), sizeof(n));
-    }
-    ofsa.close();
 }
